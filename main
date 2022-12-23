@@ -1,9 +1,11 @@
 import numpy as np
 
+#Setting the field as a class
 class Field:
     pieces = []
     saved = []
 
+    #Creating an instance of the class Field with width and height
     def __init__(self, cols, rows):
         self.n = rows
         self.m = cols
@@ -12,6 +14,7 @@ class Field:
         self.pieces = []
         self.pieces.append(p)
 
+    #Defining functions for the four different movement types within the class Field
     def down(self, p):
         return p.down(self, self.m, self.n)
 
@@ -24,6 +27,8 @@ class Field:
     def right(self, p):
         p.right(self.m)
 
+
+#a function to print out the field and saved pieces
     def draw(self):
         lst = []
         for p in self.pieces:
@@ -39,6 +44,7 @@ class Field:
                 k += 1
             print(s.strip())
 
+    #a function to move the blocks down
     def down_all(self):
         vmax = (self.n - 1) * self.m
         while np.intersect1d(self.saved, range(vmax, vmax + self.m)).size == self.m:
@@ -46,6 +52,7 @@ class Field:
 
 class Piese:
 
+    #defining the block as an instance of class Piese
     def __init__(self, name, sh):
         self.name = name
         self.shapes = sh
@@ -54,6 +61,8 @@ class Piese:
         self.idx = 0
         self.live = True
 
+    #Defining the functions for the the four movement types within the class Piese
+    #This is how the dimensions change with each movement type
     def left(self, m):
         if self.live:
             v0 = min([v % m for v in self.shapes[self.idx]])
@@ -71,6 +80,8 @@ class Piese:
             self.turn += 1
             self.idx = self.turn % self.turns
 
+    #Within this movement the saved, live condition is checked
+    #If piece sets on top of saved block or bottom row, the piece is saved
     def down(self, g, m, n):
         row0 = m
         if self.live:
@@ -90,6 +101,8 @@ class Piese:
                 row0 = min(g.saved) // m
         return row0
 
+#The seven different sized blocks with given dimensions
+#The rotated dimensions are included with each block
 O = [[4, 14, 15, 5]]
 I = [[4, 14, 24, 34], [3, 4, 5, 6]]
 S = [[5, 4, 14, 13], [4, 14, 15, 25]]
@@ -98,14 +111,22 @@ L = [[4, 14, 24, 25], [5, 15, 14, 13], [4, 5, 15, 25], [6, 5, 4, 14]]
 J = [[5, 15, 25, 24], [15, 5, 4, 3], [5, 4, 14, 24], [4, 14, 15, 16]]
 T = [[4, 14, 24, 15], [4, 13, 14, 15], [5, 15, 25, 14], [4, 5, 6, 15]]
 
+#creating recognized names for the various blocks
 dic = {'O': O, 'I': I, 'S': S, 'Z': Z, 'L': L, 'J': J, 'T': T, }
 
+#Start of game
+#Take input to define size of field
 cmd = input()
 m, n = cmd.split()
 g = Field(int(m), int(n))
 g.draw()
 p = None
 
+
+#The main for loop that takes input from user to move blocks as they fall,
+#user will choose a piece, piece is live until falls on bottom row or saved piece
+#User will input a new movement command for each turn
+#User can input exit to leave game
 while True:
     # cmd = input('\nInput command: ')
     cmd = input('\n')
@@ -128,8 +149,9 @@ while True:
         g.right(p)
     elif cmd == 'rotate':
         g.rotate(p)
-    row = g.down(p)
+    row = g.down(p) #to make the block move down each turn
     g.draw()
+    #the game over conditions, if blocks reach top row
     if row < 1:
         print('\nGame Over!')
         break
